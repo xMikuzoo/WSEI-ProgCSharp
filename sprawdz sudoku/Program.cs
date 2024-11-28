@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace sprawdz_sudoku
 {
@@ -10,38 +11,117 @@ namespace sprawdz_sudoku
     {
         static void Main(string[] args)
         {
-            checkSudoku( 
-                new int[9, 9]
-                {
-                    { 2, 5, 1, 7, 6, 9, 3, 4, 8},
-                    { 9, 8, 6, 3, 4, 5, 2, 7, 1},
-                    { 3, 7, 4, 8, 2, 1, 6, 9, 5},
-                    { 4, 2, 9, 6, 3, 8, 5, 1, 7},
-                    { 8, 6, 3, 5, 1, 7, 9, 2, 4},
-                    { 5, 1, 7, 4, 9, 2, 8, 3, 6},
-                    { 7, 9, 5, 1, 8, 3, 4, 6, 2},
-                    { 1, 4, 2, 9, 5, 6, 7, 8, 3},
-                    { 6, 3, 8, 2, 7, 4, 1, 5, 9}
-                });
-
-            //checkSudoku(
-            //    new int[9, 9]
-            //    {
-            //        { 2, 5, 1, 7, 6, 9, 3, 4, 8},
-            //        { 9, 8, 6, 3, 4, 5, 2, 7, 1},
-            //        { 3, 7, 4, 8, 2, 1, 6, 9, 5},
-            //        { 4, 2, 9, 6, 3, 8, 5, 1, 7},
-            //        { 8, 6, 3, 5, 1, 7, 9, 2, 4},
-            //        { 5, 1, 7, 4, 9, 2, 8, 3, 6},
-            //        { 7, 9, 5, 1, 8, 3, 4, 6, 2},
-            //        { 1, 4, 2, 9, 5, 6, 7, 8, 3},
-            //        { 6, 3, 8, 2, 7, 4, 1, 9, 5}
-            //    });
+            CheckSudoku(args);
         }
-        public static bool checkSudoku(int[,] sudoku)
-        {
 
-            return true;
+
+
+        public static void CheckSudoku(string[] args)
+        {
+            var result = "yes";
+            var sudoku = new int[9, 9];
+
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                var row = Console.ReadLine().Split(' ');
+                for (int j = 0; j < sudoku.GetLength(1);j++)
+                {
+                    sudoku[i,j] = int.Parse(row[j]);
+                }
+            }
+
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                for (int j = 0; j < sudoku.GetLength(1); j++)
+                {
+                    Console.Write($"{sudoku[i,j]} ");
+                }
+                Console.WriteLine();
+            }
+
+            var block1 = new List<int>();
+            var block2 = new List<int>();
+            var block3 = new List<int>();
+            var block4 = new List<int>();
+            var block5 = new List<int>();
+            var block6 = new List<int>();
+            var block7 = new List<int>();
+            var block8 = new List<int>();
+            var block9 = new List<int>();
+
+            var blocks = new List<List<int>>()
+                {
+                    block1, block2, block3,
+                    block4, block5, block6,
+                    block7, block8, block9
+                };
+
+            for (int i = 0; i < sudoku.GetLength(0); i++)
+            {
+                var row = new List<int>();
+                var col = new List<int>();
+
+                for (int j = 0; j < sudoku.GetLength(1); j++)
+                {
+                    //row1
+                    if(i < 3 && j < 3)
+                    {
+                        block1.Add(sudoku[i, j]);
+                    }
+                    if(i < 3 && j >=3 && j < 6)
+                    {
+                        block2.Add(sudoku[i, j]);
+                    }
+                    if (i < 3 && j >= 6)
+                    {
+                        block3.Add(sudoku[i, j]);
+                    }
+                    //row2
+                    if (i >=3 && i < 6 && j < 3)
+                    {
+                        block4.Add(sudoku[i, j]);
+                    }
+                    if (i >=3 && i < 6 && j >= 3 && j < 6)
+                    {
+                        block5.Add(sudoku[i, j]);
+                    }
+                    if (i >=3 && i < 6 && j >= 6)
+                    {
+                        block6.Add(sudoku[i, j]);
+                    }
+                    //row3
+                    if (i >= 6 && j < 3)
+                    {
+                        block7.Add(sudoku[i, j]);
+                    }
+                    if (i >= 6 && j >= 3 && j < 6)
+                    {
+                        block8.Add(sudoku[i, j]);
+                    }
+                    if (i >= 6 && j >= 6)
+                    {
+                        block9.Add(sudoku[i, j]);
+                    }
+
+                    row.Add(sudoku[i, j]);
+                    col.Add(sudoku[j, i]);
+                }
+
+                if(row.Sum()!= 45 || col.Sum()!=45)
+                {
+                    result = "no";
+                }
+            }
+
+            foreach (var block in blocks)
+            {
+                if (block.Sum() != 45)
+                {
+                    result = "no";
+                }
+            }
+
+            Console.WriteLine(result);
         }
     }
 }
