@@ -11,117 +11,74 @@ namespace sprawdz_sudoku
     {
         static void Main(string[] args)
         {
+            //ogolnie to petle do sprawdzania blokow podjebalem ze stacka
+            //
+            //hashset mi czacik pokazal i to dziala tak ze pozwala na dodanie tylko unikalnych
+            //i jak bedziez chcial dodac cos co juz istnieje to ci zwroci false
             CheckSudoku(args);
         }
-
-
-
         public static void CheckSudoku(string[] args)
         {
-            var result = "yes";
             var sudoku = new int[9, 9];
 
-            for (int i = 0; i < sudoku.GetLength(0); i++)
+            //sprawdza unikalnosc i czy sa od 1-9 w rzedach i kolumnach
+            for (int blockRow = 0; blockRow < 3; blockRow++)
             {
-                var row = Console.ReadLine().Split(' ');
-                for (int j = 0; j < sudoku.GetLength(1);j++)
+                for (int blockCol = 0; blockCol < 3; blockCol++)
                 {
-                    sudoku[i,j] = int.Parse(row[j]);
+                    var sum = 0;
+                    var blockSet = new HashSet<int>();
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            var cellValue = sudoku[blockRow * 3 + i, blockCol * 3 + j];
+
+                            if (!blockSet.Add(cellValue))
+                            {
+                                Console.WriteLine("no");
+                                return;
+                            }
+
+                            sum += cellValue;
+                        }
+                    }
+                    if (sum != 45)
+                    {
+                        Console.WriteLine("no");
+                        return;
+                    }
                 }
             }
 
+            //sprawdza unikalnosc i czy sa od 1-9 w blokach 3x3
             for (int i = 0; i < sudoku.GetLength(0); i++)
             {
+                var rowSet = new HashSet<int>();
+                var colSet = new HashSet<int>();
+                int rowSum = 0, colSum = 0;
+
                 for (int j = 0; j < sudoku.GetLength(1); j++)
                 {
-                    Console.Write($"{sudoku[i,j]} ");
-                }
-                Console.WriteLine();
-            }
-
-            var block1 = new List<int>();
-            var block2 = new List<int>();
-            var block3 = new List<int>();
-            var block4 = new List<int>();
-            var block5 = new List<int>();
-            var block6 = new List<int>();
-            var block7 = new List<int>();
-            var block8 = new List<int>();
-            var block9 = new List<int>();
-
-            var blocks = new List<List<int>>()
-                {
-                    block1, block2, block3,
-                    block4, block5, block6,
-                    block7, block8, block9
-                };
-
-            for (int i = 0; i < sudoku.GetLength(0); i++)
-            {
-                var row = new List<int>();
-                var col = new List<int>();
-
-                for (int j = 0; j < sudoku.GetLength(1); j++)
-                {
-                    //row1
-                    if(i < 3 && j < 3)
+                    if (!rowSet.Add(sudoku[i, j]) || !colSet.Add(sudoku[j, i]))
                     {
-                        block1.Add(sudoku[i, j]);
-                    }
-                    if(i < 3 && j >=3 && j < 6)
-                    {
-                        block2.Add(sudoku[i, j]);
-                    }
-                    if (i < 3 && j >= 6)
-                    {
-                        block3.Add(sudoku[i, j]);
-                    }
-                    //row2
-                    if (i >=3 && i < 6 && j < 3)
-                    {
-                        block4.Add(sudoku[i, j]);
-                    }
-                    if (i >=3 && i < 6 && j >= 3 && j < 6)
-                    {
-                        block5.Add(sudoku[i, j]);
-                    }
-                    if (i >=3 && i < 6 && j >= 6)
-                    {
-                        block6.Add(sudoku[i, j]);
-                    }
-                    //row3
-                    if (i >= 6 && j < 3)
-                    {
-                        block7.Add(sudoku[i, j]);
-                    }
-                    if (i >= 6 && j >= 3 && j < 6)
-                    {
-                        block8.Add(sudoku[i, j]);
-                    }
-                    if (i >= 6 && j >= 6)
-                    {
-                        block9.Add(sudoku[i, j]);
+                        Console.WriteLine("no");
+                        return;
                     }
 
-                    row.Add(sudoku[i, j]);
-                    col.Add(sudoku[j, i]);
+                    rowSum += sudoku[i, j];
+                    colSum += sudoku[j, i];
                 }
 
-                if(row.Sum()!= 45 || col.Sum()!=45)
+                if (rowSum != 45 || colSum != 45)
                 {
-                    result = "no";
+                    Console.WriteLine("no");
+                    return;
                 }
             }
 
-            foreach (var block in blocks)
-            {
-                if (block.Sum() != 45)
-                {
-                    result = "no";
-                }
-            }
-
-            Console.WriteLine(result);
+            Console.WriteLine("yes");
         }
     }
 }
