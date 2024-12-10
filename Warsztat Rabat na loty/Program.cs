@@ -104,6 +104,11 @@ namespace Warsztat_Rabat_na_loty
         {
             double discount = 0;
 
+            if(!isDomesticFlight && (passengerAge > 2 || isFlightInSeason))
+            {
+                return 0;
+            }
+
             if (monthsBeforeFlight >= 5)
             {
                 discount += 0.1;
