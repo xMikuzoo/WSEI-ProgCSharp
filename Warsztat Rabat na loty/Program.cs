@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Warsztat_Rabat_na_loty
 {
@@ -59,7 +58,7 @@ namespace Warsztat_Rabat_na_loty
             listDataBuilder.AppendLine($" * Stały klient: {(isRegularCustomer ? "Tak" : "Nie")}");
             listDataBuilder.AppendLine();
             listDataBuilder.AppendLine($"Przysługuje Ci rabat w wysokości: {discount:P}");
-            listDataBuilder.AppendLine($"Data wygenerowania raportu: {DateTime.Now}");
+            listDataBuilder.AppendLine($"Data wygenerowania raportu: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
 
             Console.WriteLine(listDataBuilder.ToString());
         }
@@ -134,7 +133,7 @@ namespace Warsztat_Rabat_na_loty
                 return discount >= 0.8 ? 0.8 : discount;
             }
 
-            if(passengerAge >= 2 && passengerAge <= 16 && isDomesticFlight)
+            if(passengerAge >= 2 && passengerAge <= 16)
             {
                 discount += 0.1;
             }
