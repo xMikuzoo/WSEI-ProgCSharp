@@ -42,7 +42,7 @@ namespace Warsztat_Rabat_na_loty
 
             var monthsBeforeFlight = -(((today.Year - flightDate.Year) * 12) + today.Month - flightDate.Month);
 
-            double discount = CalculateTheDiscount(passengerAge, isDomesticFlight, monthsBeforeFlight, isFlightInSeason, isRegularCustomer);
+            double discount = CalculateDiscount(passengerAge, isDomesticFlight, monthsBeforeFlight, isFlightInSeason, isRegularCustomer);
 
             //wypisanie danych
             var listDataBuilder = new StringBuilder();
@@ -100,14 +100,14 @@ namespace Warsztat_Rabat_na_loty
                 Console.WriteLine("Podano niepoprawne dane");
             }
         }
-        public static double CalculateTheDiscount(int passengerAge, bool isDomesticFlight, int monthsBeforeFlight, bool isFlightInSeason, bool isRegularCustomer)
+        public static double CalculateDiscount(int passengerAge, bool isDomesticFlight, int monthsBeforeFlight, bool isFlightInSeason, bool isRegularCustomer)
         {
-            double discount = 0;
-
-            if(!isDomesticFlight && (passengerAge > 2 || isFlightInSeason))
+            if (!isDomesticFlight && (passengerAge > 2 || isFlightInSeason))
             {
                 return 0;
             }
+
+            double discount = 0;
 
             if (monthsBeforeFlight >= 5)
             {
