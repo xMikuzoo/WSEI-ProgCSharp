@@ -13,17 +13,25 @@ namespace Warsztat_Rabat_na_loty
             }
             catch (Exception e)
             {
+                Console.WriteLine("Coś poszło nie tak :/");
                 Console.WriteLine(e.Message);
+                Console.WriteLine("Zacznijmy jeszcze raz");
+                Zadanie1 ();
             }
-
-            Console.ReadKey();
         }
-
         public static void Zadanie1()
         {
             //zebranie danych
-            Console.Write("Podaj swoją datę urodzenia w formacie RRRR-MM-DD: ");
-            DateTime birthDate = DateTime.Parse(Console.ReadLine());
+            DateTime birthDate = ReadBirthDate();
+            DateTime flightDate = ReadFlightDate();
+            bool isDomesticFlight = ReadTrueFalse("Czy lot jest krajowy");
+            bool isRegularCustomer = ReadTrueFalse("Czy jesteś stałym klientem");
+
+            //przygotowanie danych
+            bool isFlightInSeason =
+                flightDate.Month >= 12 && flightDate.Month <= 1 && flightDate.Day >= 20 && flightDate.Day <= 10 ||
+                flightDate.Month >= 3 && flightDate.Month <= 4 && flightDate.Day >= 20 && flightDate.Day <= 10 ||
+                flightDate.Month == 6 || flightDate.Month == 7;
 
             var today = DateTime.Today;
 
@@ -33,32 +41,14 @@ namespace Warsztat_Rabat_na_loty
                 passengerAge--;
             }
 
-            Console.Write("Podaj datę lotu w formacie RRRR-MM-DD: ");
-            DateTime flightDate = DateTime.Parse(Console.ReadLine());
-
             var monthsBeforeFlight = -(((today.Year - flightDate.Year) * 12) + today.Month - flightDate.Month);
-
-            Console.Write("Czy lot jest krajowy (T/N)? ");
-            string isDomesticFlightInput = Console.ReadLine().ToLower();
-            bool isDomesticFlight = isDomesticFlightInput == "t" ? true : isDomesticFlightInput == "n" ? false : throw new ArgumentException("Podano niepoprawne dane");
-
-            Console.WriteLine("Czy jesteś stałym klientem (T/N)? ");
-            string isRegularCustomerInput = Console.ReadLine().ToLower();
-            bool isRegularCustomer = isRegularCustomerInput == "t" ? true : isRegularCustomerInput == "n" ? false : throw new ArgumentException("Podano niepoprawne dane");
-
-            bool isFlightInSeason =
-                //święto 1
-                flightDate.Month >= 12 && flightDate.Month <= 1 && flightDate.Day >= 20 && flightDate.Day <= 10 ||
-                //święto 2
-                flightDate.Month >= 3 && flightDate.Month <= 4 && flightDate.Day >= 20 && flightDate.Day <= 10 ||
-                //wakacje
-                flightDate.Month == 6 || flightDate.Month == 7;
 
             double discount = CalculateTheDiscount(passengerAge, isDomesticFlight, monthsBeforeFlight, isFlightInSeason, isRegularCustomer);
 
             //wypisanie danych
             var listDataBuilder = new StringBuilder();
 
+            listDataBuilder.AppendLine();
             listDataBuilder.AppendLine("=== Do obliczeń przyjęto: ");
             listDataBuilder.AppendLine($" * Data urodzenia: {birthDate:d}");
             listDataBuilder.AppendLine($" * Data lotu: {flightDate:D}.{(isFlightInSeason ? " Lot w sezonie" : string.Empty)}");
@@ -68,33 +58,88 @@ namespace Warsztat_Rabat_na_loty
             }
             listDataBuilder.AppendLine($" * Stały klient: {(isRegularCustomer ? "Tak" : "Nie")}");
             listDataBuilder.AppendLine();
-            listDataBuilder.AppendLine($"Przysługuje Ci rabat w wysokości: {discount:P0}");
+            listDataBuilder.AppendLine($"Przysługuje Ci rabat w wysokości: {discount:P}");
+            listDataBuilder.AppendLine($"Data wygenerowania raportu: {DateTime.Now}");
 
             Console.WriteLine(listDataBuilder.ToString());
-
         }
 
+        public static DateTime ReadBirthDate()
+        {
+            while (true)
+            {
+                Console.Write("Podaj swoją datę urodzenia w formacie RRRR-MM-DD: ");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime birthDate))
+                {
+                    return birthDate;
+                }
+                Console.WriteLine("Niepoprawny format daty. Spróbuj ponownie.");
+            }
+        }
+        public static DateTime ReadFlightDate()
+        {
+            while (true)
+            {
+                Console.Write("Podaj datę lotu w formacie RRRR-MM-DD: ");
+                if (DateTime.TryParse(Console.ReadLine(), out DateTime flightDate))
+                {
+                    return flightDate;
+                }
+                Console.WriteLine("Niepoprawny format daty. Spróbuj ponownie.");
+            }
+        }
+        public static bool ReadTrueFalse(string message)
+        {
+            while (true)
+            {
+                Console.Write($"{message} (T/N)? ");
+                string input = Console.ReadLine().ToLower();
+                if (input == "t" || input == "n")
+                {
+                    return input == "t" ? true : false;
+                }
+                Console.WriteLine("Podano niepoprawne dane");
+            }
+        }
         public static double CalculateTheDiscount(int passengerAge, bool isDomesticFlight, int monthsBeforeFlight, bool isFlightInSeason, bool isRegularCustomer)
         {
+            double discount = 0;
+
+            if (monthsBeforeFlight >= 5)
+            {
+                discount += 0.1;
+            }
+
+            if (!isDomesticFlight && !isFlightInSeason)
+            {
+                discount += 0.15;
+            }
+
+            if (passengerAge >= 18 && isRegularCustomer)
+            {
+                discount += 0.15;
+            }
+
             if (passengerAge < 2)
             {
                 if (isDomesticFlight)
                 {
-                    return 0.8;
+                    discount += 0.8;
                 }
-                if (!isDomesticFlight)
+                else 
                 {
-                    return 0.7;
+                    discount += 0.7;
                 }
+
+                return discount >= 0.8 ? 0.8 : discount;
             }
 
-            if(passengerAge >=2 && passengerAge <= 16)
+            if(passengerAge >= 2 && passengerAge <= 16 && isDomesticFlight)
             {
-                return 0.1;
+                discount += 0.1;
             }
-
-            return 0;
+            
+            return discount >= 0.3 ? 0.3 : discount;
         }
-
     }
 }
