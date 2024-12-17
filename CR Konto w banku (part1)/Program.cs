@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CR_Konto_w_banku__part1_
+﻿namespace CR_Konto_w_banku__part1_
 {
     internal class Program
     {

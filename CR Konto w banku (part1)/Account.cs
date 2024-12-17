@@ -2,75 +2,44 @@
 {
     public class Account : IAccount
     {
-        public Account(string name, decimal balance = 0m) 
-        {
-            this.Name = PrepareName(name);
-            this.Balance = PrepareBalance(balance);
-            this.IsBlocked = false;
-        }
+        protected const int PRECISION = 4;
 
-        public string Name { get;}
-        public decimal Balance { get; set; }
-        public bool IsBlocked { get; private set; }
+        public string Name { get; }
+        public decimal Balance { get; private set; }
 
-        public void Block()
-        {
-            this.IsBlocked = true;
-        }
 
-        public void Unblock()
-        {
-            this.IsBlocked = false;
-        }
+        public bool IsBlocked { get; private set; } = false;
+        public void Block() => IsBlocked = true;
+        public void Unblock() => IsBlocked = false;
 
-        public bool Deposit(decimal money)
+        public Account(string name, decimal initialBalance = 0)
         {
-            if(money < 0 || IsBlocked)
-            {
-                return false;
-            }
-            Balance += money;
-            return true;
-        }
-
-        public bool Withdrawal(decimal money)
-        {
-            if (money <= 0 || IsBlocked || Balance - money <  0)
-            {
-                return false;
-            }
-            Balance -= money;
-            return true;
-        }
-
-        private string PrepareName(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
+            if (name == null || initialBalance < 0)
                 throw new ArgumentOutOfRangeException();
-            }
-
-            name = name.Trim();
-
-            if(name.Length < 3)
-            {
+            Name = name.Trim();
+            if (Name.Length < 3)
                 throw new ArgumentException();
-            }
-            return name.Trim();
-        }
-        private decimal PrepareBalance(decimal balance)
-        {
-            if(balance < 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-            return Math.Round(balance,4);
+            Balance = Math.Round(initialBalance, PRECISION);
         }
 
-        public override string ToString()
+        public bool Deposit(decimal amount)
         {
-            var accountInfo = $"Account name: {Name}, balance: {Balance:f2}";
-            return IsBlocked ? $"{accountInfo}, blocked" : accountInfo; 
+            if (amount <= 0 || IsBlocked) return false;
+
+            Balance = Math.Round(Balance += amount, PRECISION);
+            return true;
         }
+
+        public bool Withdrawal(decimal amount)
+        {
+            if (amount <= 0 || IsBlocked || amount > Balance) return false;
+
+            Balance = Math.Round(Balance -= amount, PRECISION);
+            return true;
+        }
+
+        public override string ToString() =>
+            IsBlocked ? $"Account name: {Name}, balance: {Balance:F2}, blocked"
+                        : $"Account name: {Name}, balance: {Balance:F2}";
     }
 }
