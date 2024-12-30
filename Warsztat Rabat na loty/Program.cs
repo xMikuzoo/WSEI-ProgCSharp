@@ -15,7 +15,7 @@ namespace Warsztat_Rabat_na_loty
                 Console.WriteLine("Coś poszło nie tak :/");
                 Console.WriteLine(e.Message);
                 Console.WriteLine("Zacznijmy jeszcze raz");
-                Zadanie1 ();
+                Zadanie1();
             }
         }
         public static void Zadanie1()
@@ -27,10 +27,16 @@ namespace Warsztat_Rabat_na_loty
             bool isRegularCustomer = ReadTrueFalse("Czy jesteś stałym klientem");
 
             //przygotowanie danych
+            var flightYear = flightDate.Year;
+            DateTime christmasStart = flightDate.Month == 1 ? new DateTime(flightYear - 1, 12, 20) : new DateTime(flightYear,12 ,20);
+            DateTime christmasEnd = flightDate.Month == 12 ? new DateTime(flightYear + 1, 1, 10) : new DateTime(flightYear, 1, 10);
+            DateTime springStart = new DateTime(flightYear, 3, 20);
+            DateTime springEnd = new DateTime(flightYear, 4, 10);
+
             bool isFlightInSeason =
-                flightDate.Month >= 12 && flightDate.Month <= 1 && flightDate.Day >= 20 && flightDate.Day <= 10 ||
-                flightDate.Month >= 3 && flightDate.Month <= 4 && flightDate.Day >= 20 && flightDate.Day <= 10 ||
-                flightDate.Month == 6 || flightDate.Month == 7;
+                 (flightDate >= christmasStart && flightDate <= christmasEnd) ||
+                 (flightDate >= springStart && flightDate <= springEnd) ||
+                 flightDate.Month == 6 || flightDate.Month == 7;
 
             var today = DateTime.Today;
 
@@ -51,7 +57,7 @@ namespace Warsztat_Rabat_na_loty
             listDataBuilder.AppendLine("=== Do obliczeń przyjęto: ");
             listDataBuilder.AppendLine($" * Data urodzenia: {birthDate:d}");
             listDataBuilder.AppendLine($" * Data lotu: {flightDate:D}.{(isFlightInSeason ? " Lot w sezonie" : string.Empty)}");
-            if(isDomesticFlight)
+            if (isDomesticFlight)
             {
                 listDataBuilder.AppendLine(" * Lot krajowy");
             }
@@ -102,9 +108,9 @@ namespace Warsztat_Rabat_na_loty
         }
         public static double CalculateDiscount(int passengerAge, bool isDomesticFlight, int monthsBeforeFlight, bool isFlightInSeason, bool isRegularCustomer)
         {
-            if (!isDomesticFlight && (passengerAge > 2 || isFlightInSeason))
+            if (!isDomesticFlight && !(passengerAge < 2 || !isFlightInSeason))
             {
-                return 0;
+                return 0d;
             }
 
             double discount = 0;
@@ -130,7 +136,7 @@ namespace Warsztat_Rabat_na_loty
                 {
                     discount += 0.8;
                 }
-                else 
+                else
                 {
                     discount += 0.7;
                 }
@@ -138,11 +144,11 @@ namespace Warsztat_Rabat_na_loty
                 return discount >= 0.8 ? 0.8 : discount;
             }
 
-            if(passengerAge >= 2 && passengerAge <= 16)
+            if (passengerAge >= 2 && passengerAge <= 16)
             {
                 discount += 0.1;
             }
-            
+
             return discount >= 0.3 ? 0.3 : discount;
         }
     }
